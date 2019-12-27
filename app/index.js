@@ -2,6 +2,9 @@
 
 // imports in the following order: stdlib, 3-rd party, local
 // imports in each section ordered alphabetically
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
 var process = require('process');
 
 var express = require('express');
@@ -11,6 +14,9 @@ var podValidator = require('./validators/v1/pod');
 
 // constants and global variables definition
 var PORT = parseInt(process.env.PORT || '3000')
+var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
+var certificate = fs.readFileSync('/etc/ssl/server.crt.pem', 'utf8');
+var credentials = { key: privateKey, cert: certificate };
 var app = express();
 
 
@@ -49,4 +55,8 @@ app.post('/', function(req, res) {
 
 // Start server
 console.log('Listening at http://0.0.0.0:' + PORT);
-app.listen(PORT);
+var httpServer = http.createServer(app);
+var httpsServer = http.createServer(credentials, app);
+
+httpServer.listen(PORT);
+httpsServer.listen(PORT + 1);
