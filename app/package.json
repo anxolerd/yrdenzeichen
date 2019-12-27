@@ -1,0 +1,22 @@
+{
+  "name": "yrdenzeichen",
+  "version": "1.0.0",
+  "description": "Validating admission webhook for kubernetes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anxolerd/yrdenzeichen.git"
+  },
+  "author": "Oleksandr Kovalchuk <anxolerd@outlook.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/anxolerd/yrdenzeichen/issues"
+  },
+  "homepage": "https://github.com/anxolerd/yrdenzeichen#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
