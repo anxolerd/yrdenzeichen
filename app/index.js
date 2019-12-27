@@ -17,7 +17,9 @@ var PORT = parseInt(process.env.PORT || '3000')
 var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
 var certificate = fs.readFileSync('/etc/ssl/server.crt.pem', 'utf8');
 var credentials = { key: privateKey, cert: certificate };
+
 var app = express();
+app.use(express.json());
 
 
 var CONFIG = {
@@ -29,6 +31,7 @@ var CONFIG = {
 // define handlers
 app.post('/', function(req, res) {
     var admissionRequest = req.body;
+    console.log('Got request: ', admissionRequest);
     var kind = admissionRequest.request.kind;
     var object = admissionRequest.request.object;
 
@@ -44,9 +47,10 @@ app.post('/', function(req, res) {
         };
     }
 
-    admissionResponse.uid = admissionRequest.uid;
+    admissionResponse.uid = admissionRequest.request.uid;
 
     var admissionReview = { response: admissionResponse };
+    console.log('Sending response', admissionReview);
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(admissionReview));
     res.status(200).end();
