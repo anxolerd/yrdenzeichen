@@ -56,7 +56,7 @@ app.post('/', function(req, res) {
 // Start server
 console.log('Listening at http://0.0.0.0:' + PORT);
 var httpServer = http.createServer(app);
-var httpsServer = http.createServer(credentials, app);
+var httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(PORT);
 httpsServer.listen(PORT + 1);
