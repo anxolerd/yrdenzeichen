@@ -13,7 +13,7 @@ var validators = require('./validators');
 
 // constants and global variables definition
 var PORT = parseInt(process.env.PORT || '3000');
-var HTTPS = (parseInt(process.env.HTTPS || '0') === 1); 
+var HTTPS = parseInt(process.env.HTTPS || '0') === 1;
 
 if (HTTPS) {
   var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
@@ -32,7 +32,9 @@ function _buildConfig() {
     }
 
     if (validators[group.toLowerCase()] === undefined) {
-      console.warn('api group `' + group.toLowerCase() + '` is not suppported yet');
+      console.warn(
+        'api group `' + group.toLowerCase() + '` is not suppported yet'
+      );
       continue;
     }
     groupValidators = validators[group.toLowerCase()];
@@ -44,23 +46,30 @@ function _buildConfig() {
 
       if (groupValidators[version.toLowerCase()] === undefined) {
         console.warn(
-          'api version `'
-          + group + '/' + version
-          + '` is not suppported yet'
+          'api version `' + group + '/' + version + '` is not suppported yet'
         );
         continue;
       }
       versionValidators = groupValidators[version.toLowerCase()];
 
       for (var kind in definition[group][version]) {
-        if (!Object.prototype.hasOwnProperty.call(definition[group][version], kind)) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            definition[group][version],
+            kind
+          )
+        ) {
           continue;
         }
         if (versionValidators[kind.toLowerCase()] === undefined) {
           console.warn(
-            'api kind `'
-            + group + '/' + version + '/' + kind
-            + '` is not suppported yet'
+            'api kind `' +
+              group +
+              '/' +
+              version +
+              '/' +
+              kind +
+              '` is not suppported yet'
           );
           continue;
         }
@@ -70,11 +79,17 @@ function _buildConfig() {
           var validator = versionValidators[kind.toLowerCase()][validatorName];
           if (validator === undefined) {
             console.warn(
-              'validator `' + validatorName + '` for api kind `'
-              + group + '/' + version + '/' + kind
-              + '` is not implemented yet'
+              'validator `' +
+                validatorName +
+                '` for api kind `' +
+                group +
+                '/' +
+                version +
+                '/' +
+                kind +
+                '` is not implemented yet'
             );
-            return
+            return;
           }
           validationChain.push(validator);
         });
@@ -85,7 +100,6 @@ function _buildConfig() {
   }
   return config;
 }
-
 
 var CONFIG = _buildConfig();
 console.dir(CONFIG);
@@ -102,7 +116,13 @@ app.post('/', function(req, res) {
 
   var admissionResponse;
 
-  var resourcePath = (kind.group + '/' + kind.version + '/' + kind.kind).toLowerCase();
+  var resourcePath = (
+    kind.group +
+    '/' +
+    kind.version +
+    '/' +
+    kind.kind
+  ).toLowerCase();
   var validationChain = CONFIG.validators[resourcePath];
   if (validationChain !== undefined) {
     admissionResponse = validators.validate(object, validationChain);
@@ -121,7 +141,6 @@ app.post('/', function(req, res) {
   res.send(JSON.stringify(admissionReview));
   res.status(200).end();
 });
-
 
 // Start server
 console.log('Listening at http://0.0.0.0:' + PORT);

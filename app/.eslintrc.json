@@ -1,0 +1,29 @@
+{
+    "env": {
+        "browser": false,
+        "commonjs": true,
+        "node": true,
+        "jest/globals": true
+    },
+    "extends": [
+        "esnext",
+        "node"
+    ],
+    "plugins": ["jest"],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "indent": ["error", 2],
+        "no-var": "off",
+        "object-shorthand": "off",
+        "prefer-arrow-callback": "off",
+        "import/no-commonjs": "off",
+        "import/no-nodejs-modules": "off",
+        "no-loop-func": "off"
+    }
+}

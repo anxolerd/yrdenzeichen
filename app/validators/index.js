@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 function validate(object, validationChain) {
   var result = {
     valid: true,
-    errors: []
+    errors: [],
   };
   validationChain.forEach(function(validator) {
     var r = validator(object);
@@ -11,12 +11,12 @@ function validate(object, validationChain) {
     result.errors = result.errors.concat(r.errors);
   });
   var admissionResult = {
-    allowed: result.valid
+    allowed: result.valid,
   };
   if (!result.valid) {
     admissionResult.status = {
       code: 400,
-      message: result.errors.join("; ")
+      message: result.errors.join('; '),
     };
   }
   return admissionResult;
@@ -24,6 +24,6 @@ function validate(object, validationChain) {
 
 module.exports = {
   validate: validate,
-  "": { v1: require("./v1") },
-  apps: require("./apps")
+  '': { v1: require('./v1') },
+  apps: require('./apps'),
 };

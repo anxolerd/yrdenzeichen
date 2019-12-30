@@ -1,23 +1,23 @@
-"use strict";
+'use strict';
 
 function validateImageTag(podObject) {
   var result = {
     valid: true,
-    errors: []
+    errors: [],
   };
   var containers = podObject.spec.containers;
   containers.forEach(function(container) {
-    var imageAndTag = container.image.split(":");
+    var imageAndTag = container.image.split(':');
     if (imageAndTag.length === 1) {
       result.valid = false;
       result.errors.push(
-        "Container " + container.name + " does not have image tag set"
+        'Container ' + container.name + ' does not have image tag set'
       );
     }
-    if (imageAndTag.length === 2 && imageAndTag[1] === "latest") {
+    if (imageAndTag.length === 2 && imageAndTag[1] === 'latest') {
       result.valid = false;
       result.errors.push(
-        "Container " + container.name + " uses image with `latest` tag"
+        'Container ' + container.name + ' uses image with `latest` tag'
       );
     }
   });
@@ -27,15 +27,15 @@ function validateImageTag(podObject) {
 function validateImagePullPolicy(podObject) {
   var result = {
     valid: true,
-    errors: []
+    errors: [],
   };
   var containers = podObject.spec.containers;
   containers.forEach(function(container) {
     var imagePullPolicy = container.imagePullPolicy;
-    if (imagePullPolicy === "Always") {
+    if (imagePullPolicy === 'Always') {
       result.valid = false;
       result.errors.push(
-        "Container " + container.name + " uses imagePullPolicy `Always`"
+        'Container ' + container.name + ' uses imagePullPolicy `Always`'
       );
     }
   });
@@ -44,5 +44,5 @@ function validateImagePullPolicy(podObject) {
 
 module.exports = {
   validateImageTag: validateImageTag,
-  validateImagePullPolicy: validateImagePullPolicy
+  validateImagePullPolicy: validateImagePullPolicy,
 };
