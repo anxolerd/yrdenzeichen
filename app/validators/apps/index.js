@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  v1: require("./v1")
+  v1: require('./v1'),
 };

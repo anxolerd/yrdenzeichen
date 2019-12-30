@@ -1,28 +1,24 @@
 'use strict';
 
-
 module.exports = {
   '': {
-    'v1': {
-      'pod': [
-        'validateImageTag',
-        'validateImagePullPolicy',
-      ],
+    v1: {
+      pod: ['validateImageTag', 'validateImagePullPolicy'],
     },
   },
-  'apps': {
-    'v1': {
-      'deployment': [
+  apps: {
+    v1: {
+      deployment: [
         'validateImageTag',
         'validateImagePullPolicy',
         'validateRequestsLimitsSet',
       ],
-      'statefulset': [
+      statefulset: [
         'validateImageTag',
         'validateImagePullPolicy',
         'validateRequestsLimitsSet',
       ],
-      'replicaset': [
+      replicaset: [
         'validateImageTag',
         'validateImagePullPolicy',
         'validateRequestsLimitsSet',
