@@ -3,7 +3,8 @@
 var _common = require('./_common');
 
 module.exports = {
-  validateImageTag: _common.validateImageTag,
-  validateImagePullPolicy: _common.validateImagePullPolicy,
-  validateRequestsLimitsSet: _common.validateRequestsLimitsSet,
+  shouldSetImageTag: _common.shouldSetImageTag,
+  shouldNotUseTagLatest: _common.shouldNotUseTagLatest,
+  shouldNotUsePullPolicyAlways: _common.shouldNotUsePullPolicyAlways,
+  shouldSetRequestsLimits: _common.shouldSetRequestsLimits,
 };

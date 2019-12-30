@@ -1,6 +1,6 @@
 'use strict';
 
-function validateImageTag(object) {
+function shouldSetImageTag(object) {
   var result = {
     valid: true,
     errors: [],
@@ -14,6 +14,18 @@ function validateImageTag(object) {
         'Container ' + container.name + ' does not have image tag set'
       );
     }
+  });
+  return result;
+}
+
+function shouldNotUseTagLatest(object) {
+  var result = {
+    valid: true,
+    errors: [],
+  };
+  var containers = object.spec.template.spec.containers;
+  containers.forEach(function(container) {
+    var imageAndTag = container.image.split(':');
     if (imageAndTag.length === 2 && imageAndTag[1] === 'latest') {
       result.valid = false;
       result.errors.push(
@@ -24,7 +36,7 @@ function validateImageTag(object) {
   return result;
 }
 
-function validateImagePullPolicy(object) {
+function shouldNotUsePullPolicyAlways(object) {
   var result = {
     valid: true,
     errors: [],
@@ -42,7 +54,7 @@ function validateImagePullPolicy(object) {
   return result;
 }
 
-function validateRequestsLimitsSet(object) {
+function shouldSetRequestsLimits(object) {
   var result = {
     valid: true,
     errors: [],
@@ -111,7 +123,8 @@ function validateRequestsLimitsSet(object) {
 }
 
 module.exports = {
-  validateImageTag: validateImageTag,
-  validateImagePullPolicy: validateImagePullPolicy,
-  validateRequestsLimitsSet: validateRequestsLimitsSet,
+  shouldSetImageTag: shouldSetImageTag,
+  shouldNotUseTagLatest: shouldNotUseTagLatest,
+  shouldNotUsePullPolicyAlways: shouldNotUsePullPolicyAlways,
+  shouldSetRequestsLimits: shouldSetRequestsLimits,
 };

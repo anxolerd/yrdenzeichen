@@ -3,25 +3,32 @@
 module.exports = {
   '': {
     v1: {
-      pod: ['validateImageTag', 'validateImagePullPolicy'],
+      pod: [
+        'shouldSetImageTag',
+        'shouldNotUseTagLatest',
+        'shouldNotUsePullPolicyAlways',
+      ],
     },
   },
   apps: {
     v1: {
       deployment: [
-        'validateImageTag',
-        'validateImagePullPolicy',
-        'validateRequestsLimitsSet',
+        'shouldSetImageTag',
+        'shouldNotUseTagLatest',
+        'shouldNotUsePullPolicyAlways',
+        'shouldSetRequestsLimits',
       ],
       statefulset: [
-        'validateImageTag',
-        'validateImagePullPolicy',
-        'validateRequestsLimitsSet',
+        'shouldsetimagetag',
+        'shouldnotusetaglatest',
+        'shouldnotusepullpolicyalways',
+        'shouldsetrequestslimits',
       ],
       replicaset: [
-        'validateImageTag',
-        'validateImagePullPolicy',
-        'validateRequestsLimitsSet',
+        'shouldsetimagetag',
+        'shouldnotusetaglatest',
+        'shouldnotusepullpolicyalways',
+        'shouldsetrequestslimits',
       ],
     },
   },

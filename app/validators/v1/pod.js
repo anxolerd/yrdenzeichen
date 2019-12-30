@@ -1,6 +1,6 @@
 'use strict';
 
-function validateImageTag(podObject) {
+function shouldSetImageTag(podObject) {
   var result = {
     valid: true,
     errors: [],
@@ -14,6 +14,18 @@ function validateImageTag(podObject) {
         'Container ' + container.name + ' does not have image tag set'
       );
     }
+  });
+  return result;
+}
+
+function shouldNotUseTagLatest(podObject) {
+  var result = {
+    valid: true,
+    errors: [],
+  };
+  var containers = podObject.spec.containers;
+  containers.forEach(function(container) {
+    var imageAndTag = container.image.split(':');
     if (imageAndTag.length === 2 && imageAndTag[1] === 'latest') {
       result.valid = false;
       result.errors.push(
@@ -24,7 +36,7 @@ function validateImageTag(podObject) {
   return result;
 }
 
-function validateImagePullPolicy(podObject) {
+function shouldNotUsePullPolicyAlways(podObject) {
   var result = {
     valid: true,
     errors: [],
@@ -43,6 +55,7 @@ function validateImagePullPolicy(podObject) {
 }
 
 module.exports = {
-  validateImageTag: validateImageTag,
-  validateImagePullPolicy: validateImagePullPolicy,
+  shouldSetImageTag: shouldSetImageTag,
+  shouldNotUseTagLatest: shouldNotUseTagLatest,
+  shouldNotUsePullPolicyAlways: shouldNotUsePullPolicyAlways,
 };
