@@ -9,62 +9,127 @@ var process = require('process');
 
 var express = require('express');
 
-var deploymentValidator = require('./validators/apps/v1/deployment');
-var podValidator = require('./validators/v1/pod');
-var replicasetValidator = require('./validators/apps/v1/replicaset');
-var statefulsetValidator = require('./validators/apps/v1/statefulset');
+var validators = require('./validators');
 
 // constants and global variables definition
-var PORT = parseInt(process.env.PORT || '3000')
-var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
-var certificate = fs.readFileSync('/etc/ssl/server.crt.pem', 'utf8');
-var credentials = { key: privateKey, cert: certificate };
+var PORT = parseInt(process.env.PORT || '3000');
+var HTTPS = (parseInt(process.env.HTTPS || '0') === 1); 
+
+if (HTTPS) {
+  var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
+  var certificate = fs.readFileSync('/etc/ssl/server.crt.pem', 'utf8');
+  var credentials = { key: privateKey, cert: certificate };
+}
+
+function _buildConfig() {
+  var config = { validators: {} };
+  var definition = require('./config');
+
+  var groupValidators, versionValidators;
+  for (var group in definition) {
+    if (!Object.prototype.hasOwnProperty.call(definition, group)) {
+      continue;
+    }
+
+    if (validators[group.toLowerCase()] === undefined) {
+      console.warn('api group `' + group.toLowerCase() + '` is not suppported yet');
+      continue;
+    }
+    groupValidators = validators[group.toLowerCase()];
+
+    for (var version in definition[group]) {
+      if (!Object.prototype.hasOwnProperty.call(definition[group], version)) {
+        continue;
+      }
+
+      if (groupValidators[version.toLowerCase()] === undefined) {
+        console.warn(
+          'api version `'
+          + group + '/' + version
+          + '` is not suppported yet'
+        );
+        continue;
+      }
+      versionValidators = groupValidators[version.toLowerCase()];
+
+      for (var kind in definition[group][version]) {
+        if (!Object.prototype.hasOwnProperty.call(definition[group][version], kind)) {
+          continue;
+        }
+        if (versionValidators[kind.toLowerCase()] === undefined) {
+          console.warn(
+            'api kind `'
+            + group + '/' + version + '/' + kind
+            + '` is not suppported yet'
+          );
+          continue;
+        }
+
+        var validationChain = [];
+        definition[group][version][kind].forEach(function(validatorName) {
+          var validator = versionValidators[kind.toLowerCase()][validatorName];
+          if (validator === undefined) {
+            console.warn(
+              'validator `' + validatorName + '` for api kind `'
+              + group + '/' + version + '/' + kind
+              + '` is not implemented yet'
+            );
+            return
+          }
+          validationChain.push(validator);
+        });
+        var resourcePath = (group + '/' + version + '/' + kind).toLowerCase();
+        config.validators[resourcePath] = validationChain;
+      }
+    }
+  }
+  return config;
+}
+
+
+var CONFIG = _buildConfig();
+console.dir(CONFIG);
 
 var app = express();
 app.use(express.json());
 
-
-var CONFIG = {
-    '/v1/Pod': podValidator,
-    'apps/v1/Deployment': deploymentValidator,
-    'apps/v1/StatefulSet': statefulsetValidator,
-    'apps/v1/ReplicaSet': replicasetValidator,
-}
-
-
 // define handlers
 app.post('/', function(req, res) {
-    var admissionRequest = req.body;
-    console.log('Got request: ', admissionRequest);
-    var kind = admissionRequest.request.kind;
-    var object = admissionRequest.request.object;
+  var admissionRequest = req.body;
+  console.log('Got request: ', admissionRequest);
+  var kind = admissionRequest.request.kind;
+  var object = admissionRequest.request.object;
 
-    var admissionResponse;
+  var admissionResponse;
 
-    var validator = CONFIG[kind.group + '/' + kind.version + '/' + kind.kind]
-    if (validator !== undefined) {
-        admissionResponse = validator(object);
-    } else {
-        // Default response
-        admissionResponse = {
-            allowed: true,
-        };
-    }
+  var resourcePath = (kind.group + '/' + kind.version + '/' + kind.kind).toLowerCase();
+  var validationChain = CONFIG.validators[resourcePath];
+  if (validationChain !== undefined) {
+    admissionResponse = validators.validate(object, validationChain);
+  } else {
+    // Default response
+    admissionResponse = {
+      allowed: true,
+    };
+  }
 
-    admissionResponse.uid = admissionRequest.request.uid;
+  admissionResponse.uid = admissionRequest.request.uid;
 
-    var admissionReview = { response: admissionResponse };
-    console.log('Sending response', admissionReview);
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(admissionReview));
-    res.status(200).end();
+  var admissionReview = { response: admissionResponse };
+  console.log('Sending response', admissionReview);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(admissionReview));
+  res.status(200).end();
 });
 
 
 // Start server
 console.log('Listening at http://0.0.0.0:' + PORT);
 var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
-
 httpServer.listen(PORT);
-httpsServer.listen(PORT + 1);
+
+if (HTTPS) {
+  console.log('Listening at https://0.0.0.0:' + PORT + 1);
+  var httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(PORT + 1);
+}
