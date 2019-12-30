@@ -1,12 +1,12 @@
 'use strict';
 
 
-function validateImageTag(deploymentObject) {
+function validateImageTag(replicasetObject) {
     var result = {
         valid: true,
         errors: [],
     };
-    var containers = deploymentObject.spec.template.spec.containers;
+    var containers = replicasetObject.spec.template.spec.containers;
     containers.forEach(function(container) {
         var imageAndTag = container.image.split(':');
         if (imageAndTag.length === 1) {
@@ -22,12 +22,12 @@ function validateImageTag(deploymentObject) {
 }
 
 
-function validateImagePullPolicy(deploymentObject) {
+function validateImagePullPolicy(replicasetObject) {
     var result = {
         valid: true,
         errors: [],
     };
-    var containers = deploymentObject.spec.template.spec.containers;
+    var containers = replicasetObject.spec.template.spec.containers;
     containers.forEach(function(container) {
         var imagePullPolicy = container.imagePullPolicy;
         if (imagePullPolicy === 'Always') {
@@ -39,12 +39,12 @@ function validateImagePullPolicy(deploymentObject) {
 }
 
 
-function validateRequestsLimitsSet(deploymentObject) {
+function validateRequestsLimitsSet(replicasetObject) {
     var result = {
         valid: true,
         errors: [],
     };
-    var containers = deploymentObject.spec.template.spec.containers;
+    var containers = replicasetObject.spec.template.spec.containers;
     containers.forEach(function(container) {
         var resources = container.resources;
         if (resources === undefined) {
@@ -99,13 +99,13 @@ var VALIDATION_CHAIN = [
 ]
 
 
-function validate(deploymentObject) {
+function validate(replicasetObject) {
     var result = {
         valid: true,
         errors: [],
     };
     VALIDATION_CHAIN.forEach(function(validator) {
-        var r = validator(deploymentObject);
+        var r = validator(replicasetObject);
         result.valid = result.valid && r.valid;
         result.errors = result.errors.concat(r.errors);
     });

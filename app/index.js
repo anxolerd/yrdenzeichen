@@ -11,6 +11,8 @@ var express = require('express');
 
 var deploymentValidator = require('./validators/apps/v1/deployment');
 var podValidator = require('./validators/v1/pod');
+var replicasetValidator = require('./validators/apps/v1/replicaset');
+var statefulsetValidator = require('./validators/apps/v1/statefulset');
 
 // constants and global variables definition
 var PORT = parseInt(process.env.PORT || '3000')
@@ -23,8 +25,10 @@ app.use(express.json());
 
 
 var CONFIG = {
-    '/v1/Pod': podValidator, 
+    '/v1/Pod': podValidator,
     'apps/v1/Deployment': deploymentValidator,
+    'apps/v1/StatefulSet': statefulsetValidator,
+    'apps/v1/ReplicaSet': replicasetValidator,
 }
 
 
