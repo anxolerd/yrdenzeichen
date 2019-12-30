@@ -32,7 +32,7 @@ Kubernetes
 
    .. code:: console
 
-    $kubectl -n yrdenzeichen create secret generic yrdenzeichen-certs \
+    $ kubectl -n yrdenzeichen create secret generic yrdenzeichen-certs \
         --from-file server.crt.pem \
         --from-file server.key.pem
     secret/yrdenzeichen-certs created
