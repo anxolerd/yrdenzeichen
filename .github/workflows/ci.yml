@@ -1,0 +1,26 @@
+name: CI for Yrdenzeichen
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version:
+        - 8.x
+        - 10.x
+        - 12.x
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+      working-directory: ./app
+    - run: npm run lint --if-present
+      working-directory: ./app
+    - run: npm test
+      working-directory: ./app
