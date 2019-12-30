@@ -9,7 +9,7 @@ which will keep bad deployments out of cluster.
 Validators
 ==========
 
-Validators should follow the follownig API::
+Validators should follow the following API::
 
     validator :: KubernetesObject -> {valid: bool, errors: string[]}
 
