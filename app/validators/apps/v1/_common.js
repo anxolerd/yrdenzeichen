@@ -49,13 +49,13 @@ function validateRequestsLimitsSet(object) {
         var resources = container.resources;
         if (resources === undefined) {
             result.valid = false;
-            result.errors.push('Container ' + container.name + ' does not have resource requirements set');
+            result.errors.push('Container ' + container.name + ' does not have resources requirements set');
             return;
         }
 
         if (resources.limits === undefined) {
             result.valid = false;
-            result.errors.push('Container ' + container.name + ' does not have resource limits set');
+            result.errors.push('Container ' + container.name + ' does not have resources limits set');
         } else {
             if (resources.limits.cpu === undefined) {
                 result.valid = false;
@@ -76,8 +76,8 @@ function validateRequestsLimitsSet(object) {
             // So we consider missing resources requests invalid if and only if
             // resources limits are missing as well
             result.valid = false;
-            result.errors.push('Container ' + container.name + ' does not have resource requests set');
-        } else if (resource.requests !== undefined) {
+            result.errors.push('Container ' + container.name + ' does not have resources requests set');
+        } else if (resources.requests !== undefined) {
             if (resources.requests.cpu === undefined) {
                 result.valid = false;
                 result.errors.push('Container ' + container.name + ' does not have CPU requests set');
