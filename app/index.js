@@ -9,6 +9,7 @@ var process = require('process');
 
 var express = require('express');
 
+var log = require('./logging').logger;
 var validators = require('./validators');
 
 // constants and global variables definition
@@ -32,9 +33,7 @@ function _buildConfig() {
     }
 
     if (validators[group.toLowerCase()] === undefined) {
-      console.warn(
-        'api group `' + group.toLowerCase() + '` is not suppported yet'
-      );
+      log.warn('api group `' + group.toLowerCase() + '` is not suppported yet');
       continue;
     }
     groupValidators = validators[group.toLowerCase()];
@@ -45,7 +44,7 @@ function _buildConfig() {
       }
 
       if (groupValidators[version.toLowerCase()] === undefined) {
-        console.warn(
+        log.warn(
           'api version `' + group + '/' + version + '` is not suppported yet'
         );
         continue;
@@ -62,7 +61,7 @@ function _buildConfig() {
           continue;
         }
         if (versionValidators[kind.toLowerCase()] === undefined) {
-          console.warn(
+          log.warn(
             'api kind `' +
               group +
               '/' +
@@ -78,7 +77,7 @@ function _buildConfig() {
         definition[group][version][kind].forEach(function(validatorName) {
           var validator = versionValidators[kind.toLowerCase()][validatorName];
           if (validator === undefined) {
-            console.warn(
+            log.warn(
               'validator `' +
                 validatorName +
                 '` for api kind `' +
@@ -102,7 +101,7 @@ function _buildConfig() {
 }
 
 var CONFIG = _buildConfig();
-console.dir(CONFIG);
+log.info('Configuration: ', CONFIG);
 
 var app = express();
 app.use(express.json());
@@ -110,7 +109,7 @@ app.use(express.json());
 // define handlers
 app.post('/', function(req, res) {
   var admissionRequest = req.body;
-  console.log('Got request: ', admissionRequest);
+  log.info('Got request: ', admissionRequest);
   var kind = admissionRequest.request.kind;
   var object = admissionRequest.request.object;
 
@@ -136,19 +135,19 @@ app.post('/', function(req, res) {
   admissionResponse.uid = admissionRequest.request.uid;
 
   var admissionReview = { response: admissionResponse };
-  console.log('Sending response', admissionReview);
+  log.info('Sending response', admissionReview);
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(admissionReview));
   res.status(200).end();
 });
 
 // Start server
-console.log('Listening at http://0.0.0.0:' + PORT);
+log.info('Listening at http://0.0.0.0:' + PORT);
 var httpServer = http.createServer(app);
 httpServer.listen(PORT);
 
 if (HTTPS) {
-  console.log('Listening at https://0.0.0.0:' + PORT + 1);
+  log.info('Listening at https://0.0.0.0:' + PORT + 1);
   var httpsServer = https.createServer(credentials, app);
   httpsServer.listen(PORT + 1);
 }
