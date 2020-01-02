@@ -468,3 +468,265 @@ describe('shouldSetRequestsLimits', function() {
     });
   });
 });
+
+describe('shouldNotUseMegasharesForCPU', function() {
+  test('passes when correct units are used', function() {
+    expect(
+      _common.shouldNotUseMegasharesForCPU({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: { requests: { cpu: '1' }, limits: { cpu: '1.5' } },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: { requests: { cpu: '100m' } },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('passes when resources are missing', function() {
+    expect(
+      _common.shouldNotUseMegasharesForCPU({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('passes when cpu resources are missing', function() {
+    expect(
+      _common.shouldNotUseMegasharesForCPU({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: {
+                    requests: { memory: '100Mi' },
+                    limits: { memory: '150Mi' },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('fails when Mega-(kilo-,giga-)shares are used in cpu request', function() {
+    expect(
+      _common.shouldNotUseMegasharesForCPU({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: { requests: { cpu: '1Mi' } },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: { requests: { cpu: '999Gi' } },
+                },
+                {
+                  name: 'testContainer3',
+                  resources: { requests: { cpu: '76512735Ki' } },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({
+      valid: false,
+      errors: [
+        'Container testContainer1 uses invalid measurement unit for CPU request',
+        'Container testContainer2 uses invalid measurement unit for CPU request',
+        'Container testContainer3 uses invalid measurement unit for CPU request',
+      ],
+    });
+  });
+  test('fails when Mega-(kilo-,giga-)shares are used in cpu limit', function() {
+    expect(
+      _common.shouldNotUseMegasharesForCPU({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: { limits: { cpu: '1Mi' } },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: { limits: { cpu: '999Gi' } },
+                },
+                {
+                  name: 'testContainer3',
+                  resources: { limits: { cpu: '76512735Ki' } },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({
+      valid: false,
+      errors: [
+        'Container testContainer1 uses invalid measurement unit for CPU limit',
+        'Container testContainer2 uses invalid measurement unit for CPU limit',
+        'Container testContainer3 uses invalid measurement unit for CPU limit',
+      ],
+    });
+  });
+});
+
+describe('shouldNotUseMillisharesForMemory', function() {
+  test('passes when correct units are used', function() {
+    expect(
+      _common.shouldNotUseMillisharesForMemory({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: {
+                    requests: { memory: '100' },
+                    limits: { memory: '20Ki' },
+                  },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: {
+                    requests: { memory: '100Mi' },
+                    limits: { memory: '20Gi' },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('passes when resources are missing', function() {
+    expect(
+      _common.shouldNotUseMillisharesForMemory({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('passes when memory resources are missing', function() {
+    expect(
+      _common.shouldNotUseMillisharesForMemory({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: {
+                    requests: { cpu: '1' },
+                    limits: { cpu: '1' },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({ valid: true, errors: [] });
+  });
+  test('fails when millishares are used in memory request', function() {
+    expect(
+      _common.shouldNotUseMillisharesForMemory({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: { requests: { memory: '100m' } },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: { requests: { memory: '200m' } },
+                },
+                {
+                  name: 'testContainer3',
+                  resources: { requests: { memory: '200Mi' } },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({
+      valid: false,
+      errors: [
+        'Container testContainer1 uses invalid measurement unit for memory request',
+        'Container testContainer2 uses invalid measurement unit for memory request',
+      ],
+    });
+  });
+  test('fails when millishares are used in memory limit', function() {
+    expect(
+      _common.shouldNotUseMillisharesForMemory({
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: 'testContainer1',
+                  resources: { limits: { memory: '100m' } },
+                },
+                {
+                  name: 'testContainer2',
+                  resources: { limits: { memory: '200m' } },
+                },
+                {
+                  name: 'testContainer3',
+                  resources: { limits: { memory: '100Mi' } },
+                },
+              ],
+            },
+          },
+        },
+      })
+    ).toEqual({
+      valid: false,
+      errors: [
+        'Container testContainer1 uses invalid measurement unit for memory limit',
+        'Container testContainer2 uses invalid measurement unit for memory limit',
+      ],
+    });
+  });
+});

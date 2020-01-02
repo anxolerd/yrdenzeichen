@@ -122,9 +122,93 @@ function shouldSetRequestsLimits(object) {
   return result;
 }
 
+function shouldNotUseMegasharesForCPU(object) {
+  var result = {
+    valid: true,
+    errors: [],
+  };
+
+  var containers = object.spec.template.spec.containers;
+  containers.forEach(function(container) {
+    var resources = container.resources;
+    if (resources === undefined) return;
+    if (
+      resources.requests !== undefined &&
+      resources.requests.cpu !== undefined
+    ) {
+      var cpuRequest = resources.requests.cpu;
+      if (/^\d+[KMG]i$/.test(cpuRequest)) {
+        result.valid = false;
+        result.errors.push(
+          'Container ' +
+            container.name +
+            ' uses invalid measurement unit for CPU request'
+        );
+      }
+    }
+    if (resources.limits !== undefined && resources.limits.cpu !== undefined) {
+      var cpuLimit = resources.limits.cpu;
+      if (/^\d+[KMG]i$/.test(cpuLimit)) {
+        result.valid = false;
+        result.errors.push(
+          'Container ' +
+            container.name +
+            ' uses invalid measurement unit for CPU limit'
+        );
+      }
+    }
+  });
+
+  return result;
+}
+
+function shouldNotUseMillisharesForMemory(object) {
+  var result = {
+    valid: true,
+    errors: [],
+  };
+
+  var containers = object.spec.template.spec.containers;
+  containers.forEach(function(container) {
+    var resources = container.resources;
+    if (resources === undefined) return;
+    if (
+      resources.requests !== undefined &&
+      resources.requests.memory !== undefined
+    ) {
+      var memoryRequest = resources.requests.memory;
+      if (/^\d+m$/.test(memoryRequest)) {
+        result.valid = false;
+        result.errors.push(
+          'Container ' +
+            container.name +
+            ' uses invalid measurement unit for memory request'
+        );
+      }
+    }
+    if (
+      resources.limits !== undefined &&
+      resources.limits.memory !== undefined
+    ) {
+      var memoryLimit = resources.limits.memory;
+      if (/^\d+m/.test(memoryLimit)) {
+        result.valid = false;
+        result.errors.push(
+          'Container ' +
+            container.name +
+            ' uses invalid measurement unit for memory limit'
+        );
+      }
+    }
+  });
+  return result;
+}
+
 module.exports = {
   shouldSetImageTag: shouldSetImageTag,
   shouldNotUseTagLatest: shouldNotUseTagLatest,
   shouldNotUsePullPolicyAlways: shouldNotUsePullPolicyAlways,
   shouldSetRequestsLimits: shouldSetRequestsLimits,
+  shouldNotUseMegasharesForCPU: shouldNotUseMegasharesForCPU,
+  shouldNotUseMillisharesForMemory: shouldNotUseMillisharesForMemory,
 };

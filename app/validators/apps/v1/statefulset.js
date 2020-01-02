@@ -7,4 +7,6 @@ module.exports = {
   shouldNotUseTagLatest: _common.shouldNotUseTagLatest,
   shouldNotUsePullPolicyAlways: _common.shouldNotUsePullPolicyAlways,
   shouldSetRequestsLimits: _common.shouldSetRequestsLimits,
+  shouldNotUseMillisharesForMemory: _common.shouldNotUseMillisharesForMemory,
+  shouldNotUseMegasharesForCPU: _common.shouldNotUseMegasharesForCPU,
 };
