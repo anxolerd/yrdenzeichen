@@ -64,7 +64,7 @@ Kubernetes
           spec:
             containers:
             - name: yrdenzeichen
-              image: anxolerd/yrden:20200102.1540
+              image: anxolerd/yrden:20200103.1657
               imagePullPolicy: IfNotPresent
               ports:
               - containerPort: 3000
@@ -72,8 +72,14 @@ Kubernetes
               - containerPort: 3001
                 name: https
               env:
-              - name: HTTPS
-                value: '1'
+              - name: HTTP_PORT
+                value: '3000'
+              - name: HTTPS_PORT
+                value: '3001'
+              - name: METRICS_PORT
+                value: '9090'
+              - name: LOG_JSON
+                value: 'true'
               volumeMounts:
               - name: yrdenzeichen-certs
                 mountPath: '/etc/ssl/'
