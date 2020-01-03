@@ -1,6 +1,8 @@
 'use strict';
 
-function validate(object, validationChain) {
+var metrics = require('../metrics');
+
+function validate(object, options, validationChain) {
   var result = {
     valid: true,
     errors: [],
@@ -9,6 +11,17 @@ function validate(object, validationChain) {
     var r = validator(object);
     result.valid = result.valid && r.valid;
     result.errors = result.errors.concat(r.errors);
+    if (!r.valid) {
+      metrics.rulesTriggered
+        .getHandle(
+          metrics.meter.labels({
+            resource: options.resource,
+            namespace: options.namespace,
+            rule: validator.name,
+          })
+        )
+        .add(1);
+    }
   });
   var admissionResult = {
     allowed: result.valid,

@@ -8,15 +8,24 @@ var https = require('https');
 var process = require('process');
 
 var express = require('express');
+var exporters = require('@opentelemetry/exporter-prometheus');
 
 var log = require('./logging').logger;
+var metrics = require('./metrics');
 var validators = require('./validators');
 
 // constants and global variables definition
 var PORT = parseInt(process.env.PORT || '3000');
-var HTTPS = parseInt(process.env.HTTPS || '0') === 1;
+var HTTPS_PORT =
+  process.env.HTTPS_PORT !== undefined
+    ? parseInt(process.env.HTTPS_PORT)
+    : undefined;
+var METRICS_PORT =
+  process.env.METRICS_PORT !== undefined
+    ? parseInt(process.env.METRICS_PORT)
+    : undefined;
 
-if (HTTPS) {
+if (HTTPS_PORT !== undefined) {
   var privateKey = fs.readFileSync('/etc/ssl/server.key.pem', 'utf8');
   var certificate = fs.readFileSync('/etc/ssl/server.crt.pem', 'utf8');
   var credentials = { key: privateKey, cert: certificate };
@@ -124,7 +133,11 @@ app.post('/', function(req, res) {
   ).toLowerCase();
   var validationChain = CONFIG.validators[resourcePath];
   if (validationChain !== undefined) {
-    admissionResponse = validators.validate(object, validationChain);
+    admissionResponse = validators.validate(
+      object,
+      { resource: resourcePath, namespace: admissionRequest.request.namespace },
+      validationChain
+    );
   } else {
     // Default response
     admissionResponse = {
@@ -135,6 +148,16 @@ app.post('/', function(req, res) {
   admissionResponse.uid = admissionRequest.request.uid;
 
   var admissionReview = { response: admissionResponse };
+  metrics.httpRequestsCount.getHandle(metrics.meter.labels({})).add(1);
+  metrics.validationsCount
+    .getHandle(
+      metrics.meter.labels({
+        namespace: admissionRequest.request.namespace,
+        resource: resourcePath,
+        successfull: admissionResponse.allowed,
+      })
+    )
+    .add(1);
   log.info('Sending response', admissionReview);
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(admissionReview));
@@ -146,8 +169,21 @@ log.info('Listening at http://0.0.0.0:' + PORT);
 var httpServer = http.createServer(app);
 httpServer.listen(PORT);
 
-if (HTTPS) {
-  log.info('Listening at https://0.0.0.0:' + PORT + 1);
+if (HTTPS_PORT !== undefined) {
+  log.info('Listening at https://0.0.0.0:' + HTTPS_PORT);
   var httpsServer = https.createServer(credentials, app);
-  httpsServer.listen(PORT + 1);
+  httpsServer.listen(HTTPS_PORT);
+}
+
+if (METRICS_PORT !== undefined) {
+  var exporter = new exporters.PrometheusExporter(
+    {
+      startServer: true,
+      port: METRICS_PORT,
+    },
+    function() {
+      log.info('Listening metrics at http://0.0.0.0:' + METRICS_PORT + '/metrics');
+    }
+  );
+  metrics.meter.addExporter(exporter);
 }

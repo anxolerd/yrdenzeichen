@@ -1,8 +1,10 @@
 var validators = require('../');
 
+var DUMMY_OPTIONS = { resource: 'dummy', namespace: 'dummy' };
+
 describe('validate', function() {
   test('passes when validationChain is empty', function() {
-    expect(validators.validate({}, [])).toEqual({
+    expect(validators.validate({}, DUMMY_OPTIONS, [])).toEqual({
       allowed: true,
     });
   });
@@ -16,7 +18,12 @@ describe('validate', function() {
     };
 
     expect(
-      validators.validate({}, [testPass, testFail, testPass, testPass])
+      validators.validate({}, DUMMY_OPTIONS, [
+        testPass,
+        testFail,
+        testPass,
+        testPass,
+      ])
     ).toEqual({
       allowed: false,
       status: {
@@ -35,7 +42,12 @@ describe('validate', function() {
     };
 
     expect(
-      validators.validate({}, [testPass, testFail, testPass, testFail])
+      validators.validate({}, DUMMY_OPTIONS, [
+        testPass,
+        testFail,
+        testPass,
+        testFail,
+      ])
     ).toEqual({
       allowed: false,
       status: {
