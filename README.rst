@@ -78,8 +78,6 @@ Kubernetes
                 value: '3001'
               - name: METRICS_PORT
                 value: '9090'
-              - name: LOG_JSON
-                value: 'true'
               volumeMounts:
               - name: yrdenzeichen-certs
                 mountPath: '/etc/ssl/'

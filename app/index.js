@@ -10,9 +10,12 @@ var process = require('process');
 var express = require('express');
 var exporters = require('@opentelemetry/exporter-prometheus');
 
-var log = require('./logging').logger;
+var logging = require('./logging');
 var metrics = require('./metrics');
+var readConfig = require('./configreader').readConfig;
 var validators = require('./validators');
+
+var log = logging.logger;
 
 // constants and global variables definition
 var PORT = parseInt(process.env.PORT || '3000');
@@ -31,94 +34,15 @@ if (HTTPS_PORT !== undefined) {
   var credentials = { key: privateKey, cert: certificate };
 }
 
-function _buildConfig() {
-  var config = { validators: {} };
-  var definition = require('./config');
-
-  var groupValidators, versionValidators;
-  for (var group in definition) {
-    if (!Object.prototype.hasOwnProperty.call(definition, group)) {
-      continue;
-    }
-
-    if (validators[group.toLowerCase()] === undefined) {
-      log.warn('api group `' + group.toLowerCase() + '` is not suppported yet');
-      continue;
-    }
-    groupValidators = validators[group.toLowerCase()];
-
-    for (var version in definition[group]) {
-      if (!Object.prototype.hasOwnProperty.call(definition[group], version)) {
-        continue;
-      }
-
-      if (groupValidators[version.toLowerCase()] === undefined) {
-        log.warn(
-          'api version `' + group + '/' + version + '` is not suppported yet'
-        );
-        continue;
-      }
-      versionValidators = groupValidators[version.toLowerCase()];
-
-      for (var kind in definition[group][version]) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            definition[group][version],
-            kind
-          )
-        ) {
-          continue;
-        }
-        if (versionValidators[kind.toLowerCase()] === undefined) {
-          log.warn(
-            'api kind `' +
-              group +
-              '/' +
-              version +
-              '/' +
-              kind +
-              '` is not suppported yet'
-          );
-          continue;
-        }
-
-        var validationChain = [];
-        definition[group][version][kind].forEach(function(validatorName) {
-          var validator = versionValidators[kind.toLowerCase()][validatorName];
-          if (validator === undefined) {
-            log.warn(
-              'validator `' +
-                validatorName +
-                '` for api kind `' +
-                group +
-                '/' +
-                version +
-                '/' +
-                kind +
-                '` is not implemented yet'
-            );
-            return;
-          }
-          validationChain.push(validator);
-        });
-        var resourcePath = (group + '/' + version + '/' + kind).toLowerCase();
-        config.validators[resourcePath] = validationChain;
-      }
-    }
-  }
-  return config;
-}
-
-var CONFIG = _buildConfig();
-log.info('Configuration: ', CONFIG);
-
+var CONFIG = readConfig();
+log.info('Configuration: %s', JSON.stringify(CONFIG, logging.replacer, 2));
 var app = express();
 app.use(express.json());
 
 // define handlers
 app.post('/', function(req, res) {
   var admissionRequest = req.body;
-  log.info('Got request: ', admissionRequest);
+  log.info('Got request: %s', JSON.stringify(admissionRequest, null, 2));
   var kind = admissionRequest.request.kind;
   var object = admissionRequest.request.object;
 
@@ -158,7 +82,21 @@ app.post('/', function(req, res) {
       })
     )
     .add(1);
-  log.info('Sending response', admissionReview);
+  log.info(
+    'Validation of %s %s/%s: %s',
+    resourcePath,
+    admissionRequest.request.namespace,
+    admissionRequest.request.name,
+    admissionResponse.allowed,
+    {
+      allowed: admissionResponse.allowed,
+      object:
+        admissionRequest.request.namespace +
+        '/' +
+        admissionRequest.request.name,
+    }
+  );
+
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(admissionReview));
   res.status(200).end();
@@ -182,7 +120,9 @@ if (METRICS_PORT !== undefined) {
       port: METRICS_PORT,
     },
     function() {
-      log.info('Listening metrics at http://0.0.0.0:' + METRICS_PORT + '/metrics');
+      log.info(
+        'Listening metrics at http://0.0.0.0:' + METRICS_PORT + '/metrics'
+      );
     }
   );
   metrics.meter.addExporter(exporter);
