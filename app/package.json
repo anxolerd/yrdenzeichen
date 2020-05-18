@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/anxolerd/yrdenzeichen#readme",
   "dependencies": {
-    "@opentelemetry/exporter-prometheus": "^0.3.1",
-    "@opentelemetry/metrics": "^0.3.1",
+    "@opentelemetry/exporter-prometheus": "0.3.2",
+    "@opentelemetry/metrics": "0.3.2",
     "express": "^4.17.1",
     "winston": "^3.2.1"
   },

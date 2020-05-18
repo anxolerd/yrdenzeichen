@@ -13,7 +13,7 @@ function validate(object, options, validationChain) {
     result.errors = result.errors.concat(r.errors);
     if (!r.valid) {
       metrics.rulesTriggered
-        .getHandle(
+        .bind(
           metrics.meter.labels({
             resource: options.resource,
             namespace: options.namespace,

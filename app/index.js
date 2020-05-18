@@ -72,9 +72,9 @@ app.post('/', function(req, res) {
   admissionResponse.uid = admissionRequest.request.uid;
 
   var admissionReview = { response: admissionResponse };
-  metrics.httpRequestsCount.getHandle(metrics.meter.labels({})).add(1);
+  metrics.httpRequestsCount.bind(metrics.meter.labels({})).add(1);
   metrics.validationsCount
-    .getHandle(
+    .bind(
       metrics.meter.labels({
         namespace: admissionRequest.request.namespace,
         resource: resourcePath,
