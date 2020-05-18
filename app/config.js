@@ -8,6 +8,7 @@ module.exports = {
         'shouldNotUseTagLatest',
         'shouldNotUsePullPolicyAlways',
       ],
+      service: ['shouldNotUseExternalIPs'],
     },
   },
   apps: {
