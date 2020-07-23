@@ -4,6 +4,8 @@ describe('shouldSetImageTag', function() {
   test('passes when tag is set', function() {
     expect(
       _common.shouldSetImageTag({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -23,6 +25,8 @@ describe('shouldSetImageTag', function() {
   test('fails if tag is not set', function() {
     expect(
       _common.shouldSetImageTag({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -33,13 +37,17 @@ describe('shouldSetImageTag', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have image tag set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have image tag set',
+      ],
     });
   });
 
   test('checks all containers', function() {
     expect(
       _common.shouldSetImageTag({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -54,8 +62,8 @@ describe('shouldSetImageTag', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 does not have image tag set',
-        'Container testContainer2 does not have image tag set',
+        'Container testContainer1 in Deployment Geralt does not have image tag set',
+        'Container testContainer2 in Deployment Geralt does not have image tag set',
       ],
     });
   });
@@ -65,6 +73,8 @@ describe('shouldNotUseTagLatest', function() {
   test('passes when tag is set and tag is not latest', function() {
     expect(
       _common.shouldNotUseTagLatest({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -84,6 +94,8 @@ describe('shouldNotUseTagLatest', function() {
   test('passes when tag is not set', function() {
     expect(
       _common.shouldNotUseTagLatest({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -98,6 +110,8 @@ describe('shouldNotUseTagLatest', function() {
   test('fails when tag is set and tag is latest', function() {
     expect(
       _common.shouldNotUseTagLatest({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -110,13 +124,17 @@ describe('shouldNotUseTagLatest', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer uses image with `latest` tag'],
+      errors: [
+        'Container testContainer in Deployment Geralt uses image with `latest` tag',
+      ],
     });
   });
 
   test('checks all containers', function() {
     expect(
       _common.shouldNotUseTagLatest({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -131,8 +149,8 @@ describe('shouldNotUseTagLatest', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses image with `latest` tag',
-        'Container testContainer2 uses image with `latest` tag',
+        'Container testContainer1 in Deployment Geralt uses image with `latest` tag',
+        'Container testContainer2 in Deployment Geralt uses image with `latest` tag',
       ],
     });
   });
@@ -142,6 +160,8 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('passes when imagePullPolicy set and imagePullPolicy is not `Always`', function() {
     expect(
       _common.shouldNotUsePullPolicyAlways({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -161,6 +181,8 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('passes when imagePullPolicy is not set', function() {
     expect(
       _common.shouldNotUsePullPolicyAlways({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -178,6 +200,8 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('fails when imagePullPolicy is set to `Always`', function() {
     expect(
       _common.shouldNotUsePullPolicyAlways({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -190,12 +214,16 @@ describe('shouldNotUsePullPolicyAlways', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer1 uses imagePullPolicy `Always`'],
+      errors: [
+        'Container testContainer1 in Deployment Geralt uses imagePullPolicy `Always`',
+      ],
     });
   });
   test('checks all containers', function() {
     expect(
       _common.shouldNotUsePullPolicyAlways({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -210,8 +238,8 @@ describe('shouldNotUsePullPolicyAlways', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses imagePullPolicy `Always`',
-        'Container testContainer2 uses imagePullPolicy `Always`',
+        'Container testContainer1 in Deployment Geralt uses imagePullPolicy `Always`',
+        'Container testContainer2 in Deployment Geralt uses imagePullPolicy `Always`',
       ],
     });
   });
@@ -221,6 +249,8 @@ describe('shouldSetRequestsLimits', function() {
   test('passes when requests and limits are set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -252,6 +282,8 @@ describe('shouldSetRequestsLimits', function() {
   test('passes when requests are not set, but limits are set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -279,6 +311,8 @@ describe('shouldSetRequestsLimits', function() {
   test('fails when requests are set and limits are not set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -299,13 +333,17 @@ describe('shouldSetRequestsLimits', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have resources limits set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have resources limits set',
+      ],
     });
   });
 
   test('fails when requests are set and limits are partially [memory] set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -329,13 +367,17 @@ describe('shouldSetRequestsLimits', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have CPU limits set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have CPU limits set',
+      ],
     });
   });
 
   test('fails when requests are set and limits are partially [CPU] set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -359,13 +401,17 @@ describe('shouldSetRequestsLimits', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have memory limits set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have memory limits set',
+      ],
     });
   });
 
   test('fails when requests are partially [CPU] set and limits are set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -389,12 +435,16 @@ describe('shouldSetRequestsLimits', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have memory requests set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have memory requests set',
+      ],
     });
   });
   test('fails when requests are partially [memory] set and limits are set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -418,12 +468,16 @@ describe('shouldSetRequestsLimits', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have CPU requests set'],
+      errors: [
+        'Container testContainer in Deployment Geralt does not have CPU requests set',
+      ],
     });
   });
   test('fails when requests are not set and limits are not set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -440,14 +494,16 @@ describe('shouldSetRequestsLimits', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer does not have resources limits set',
-        'Container testContainer does not have resources requests set',
+        'Container testContainer in Deployment Geralt does not have resources limits set',
+        'Container testContainer in Deployment Geralt does not have resources requests set',
       ],
     });
   });
   test('fails when resources are not set', function() {
     expect(
       _common.shouldSetRequestsLimits({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -463,7 +519,7 @@ describe('shouldSetRequestsLimits', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer does not have resources requirements set',
+        'Container testContainer in Deployment Geralt does not have resources requirements set',
       ],
     });
   });
@@ -473,6 +529,8 @@ describe('shouldNotUseMegasharesForCPU', function() {
   test('passes when correct units are used', function() {
     expect(
       _common.shouldNotUseMegasharesForCPU({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -495,6 +553,8 @@ describe('shouldNotUseMegasharesForCPU', function() {
   test('passes when resources are missing', function() {
     expect(
       _common.shouldNotUseMegasharesForCPU({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -512,6 +572,8 @@ describe('shouldNotUseMegasharesForCPU', function() {
   test('passes when cpu resources are missing', function() {
     expect(
       _common.shouldNotUseMegasharesForCPU({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -533,6 +595,8 @@ describe('shouldNotUseMegasharesForCPU', function() {
   test('fails when Mega-(kilo-,giga-)shares are used in cpu request', function() {
     expect(
       _common.shouldNotUseMegasharesForCPU({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -557,15 +621,17 @@ describe('shouldNotUseMegasharesForCPU', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses invalid measurement unit for CPU request',
-        'Container testContainer2 uses invalid measurement unit for CPU request',
-        'Container testContainer3 uses invalid measurement unit for CPU request',
+        'Container testContainer1 in Deployment Geralt uses invalid measurement unit for CPU request',
+        'Container testContainer2 in Deployment Geralt uses invalid measurement unit for CPU request',
+        'Container testContainer3 in Deployment Geralt uses invalid measurement unit for CPU request',
       ],
     });
   });
   test('fails when Mega-(kilo-,giga-)shares are used in cpu limit', function() {
     expect(
       _common.shouldNotUseMegasharesForCPU({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -590,9 +656,9 @@ describe('shouldNotUseMegasharesForCPU', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses invalid measurement unit for CPU limit',
-        'Container testContainer2 uses invalid measurement unit for CPU limit',
-        'Container testContainer3 uses invalid measurement unit for CPU limit',
+        'Container testContainer1 in Deployment Geralt uses invalid measurement unit for CPU limit',
+        'Container testContainer2 in Deployment Geralt uses invalid measurement unit for CPU limit',
+        'Container testContainer3 in Deployment Geralt uses invalid measurement unit for CPU limit',
       ],
     });
   });
@@ -602,6 +668,8 @@ describe('shouldNotUseMillisharesForMemory', function() {
   test('passes when correct units are used', function() {
     expect(
       _common.shouldNotUseMillisharesForMemory({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -630,6 +698,8 @@ describe('shouldNotUseMillisharesForMemory', function() {
   test('passes when resources are missing', function() {
     expect(
       _common.shouldNotUseMillisharesForMemory({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -647,6 +717,8 @@ describe('shouldNotUseMillisharesForMemory', function() {
   test('passes when memory resources are missing', function() {
     expect(
       _common.shouldNotUseMillisharesForMemory({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -668,6 +740,8 @@ describe('shouldNotUseMillisharesForMemory', function() {
   test('fails when millishares are used in memory request', function() {
     expect(
       _common.shouldNotUseMillisharesForMemory({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -692,14 +766,16 @@ describe('shouldNotUseMillisharesForMemory', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses invalid measurement unit for memory request',
-        'Container testContainer2 uses invalid measurement unit for memory request',
+        'Container testContainer1 in Deployment Geralt uses invalid measurement unit for memory request',
+        'Container testContainer2 in Deployment Geralt uses invalid measurement unit for memory request',
       ],
     });
   });
   test('fails when millishares are used in memory limit', function() {
     expect(
       _common.shouldNotUseMillisharesForMemory({
+        kind: 'Deployment',
+        metadata: { name: 'Geralt' },
         spec: {
           template: {
             spec: {
@@ -724,8 +800,8 @@ describe('shouldNotUseMillisharesForMemory', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses invalid measurement unit for memory limit',
-        'Container testContainer2 uses invalid measurement unit for memory limit',
+        'Container testContainer1 in Deployment Geralt uses invalid measurement unit for memory limit',
+        'Container testContainer2 in Deployment Geralt uses invalid measurement unit for memory limit',
       ],
     });
   });

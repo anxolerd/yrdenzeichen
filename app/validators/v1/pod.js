@@ -11,7 +11,11 @@ function shouldSetImageTag(podObject) {
     if (imageAndTag.length === 1) {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' does not have image tag set'
+        'Container ' +
+          container.name +
+          ' in pod ' +
+          podObject.metadata.name +
+          ' does not have image tag set'
       );
     }
   });
@@ -29,7 +33,11 @@ function shouldNotUseTagLatest(podObject) {
     if (imageAndTag.length === 2 && imageAndTag[1] === 'latest') {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' uses image with `latest` tag'
+        'Container ' +
+          container.name +
+          ' in pod ' +
+          podObject.metadata.name +
+          ' uses image with `latest` tag'
       );
     }
   });
@@ -47,7 +55,11 @@ function shouldNotUsePullPolicyAlways(podObject) {
     if (imagePullPolicy === 'Always') {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' uses imagePullPolicy `Always`'
+        'Container ' +
+          container.name +
+          ' in pod ' +
+          podObject.metadata.name +
+          ' uses imagePullPolicy `Always`'
       );
     }
   });

@@ -4,6 +4,9 @@ describe('shouldSetImageTag', function() {
   test('passes when tag is set', function() {
     expect(
       pod.shouldSetImageTag({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [{ name: 'testContainer', image: 'anxolerd/yrden:tag' }],
         },
@@ -17,19 +20,27 @@ describe('shouldSetImageTag', function() {
   test('fails if tag is not set', function() {
     expect(
       pod.shouldSetImageTag({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [{ name: 'testContainer', image: 'anxolerd/yrden' }],
         },
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer does not have image tag set'],
+      errors: [
+        'Container testContainer in pod geralt does not have image tag set',
+      ],
     });
   });
 
   test('checks all containers', function() {
     expect(
       pod.shouldSetImageTag({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer1', image: 'anxolerd/yrden' },
@@ -40,8 +51,8 @@ describe('shouldSetImageTag', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 does not have image tag set',
-        'Container testContainer2 does not have image tag set',
+        'Container testContainer1 in pod geralt does not have image tag set',
+        'Container testContainer2 in pod geralt does not have image tag set',
       ],
     });
   });
@@ -51,6 +62,9 @@ describe('shouldNotUseTagLatest', function() {
   test('passes when tag is set and tag is not latest', function() {
     expect(
       pod.shouldNotUseTagLatest({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer', image: 'anxolerd/yrden:20191230:1709' },
@@ -63,6 +77,9 @@ describe('shouldNotUseTagLatest', function() {
   test('passes when tag is not set', function() {
     expect(
       pod.shouldNotUseTagLatest({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [{ name: 'testContainer', image: 'anxolerd/yrden' }],
         },
@@ -73,6 +90,9 @@ describe('shouldNotUseTagLatest', function() {
   test('fails when tag is set and tag is latest', function() {
     expect(
       pod.shouldNotUseTagLatest({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer', image: 'anxolerd/yrden:latest' },
@@ -81,13 +101,18 @@ describe('shouldNotUseTagLatest', function() {
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer uses image with `latest` tag'],
+      errors: [
+        'Container testContainer in pod geralt uses image with `latest` tag',
+      ],
     });
   });
 
   test('checks all containers', function() {
     expect(
       pod.shouldNotUseTagLatest({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer1', image: 'anxolerd/yrden:latest' },
@@ -98,8 +123,8 @@ describe('shouldNotUseTagLatest', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses image with `latest` tag',
-        'Container testContainer2 uses image with `latest` tag',
+        'Container testContainer1 in pod geralt uses image with `latest` tag',
+        'Container testContainer2 in pod geralt uses image with `latest` tag',
       ],
     });
   });
@@ -109,6 +134,9 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('passes when imagePullPolicy set and imagePullPolicy is not `Always`', function() {
     expect(
       pod.shouldNotUsePullPolicyAlways({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer1', imagePullPolicy: 'IfNotPresent' },
@@ -124,6 +152,9 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('passes when imagePullPolicy is not set', function() {
     expect(
       pod.shouldNotUsePullPolicyAlways({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [{ name: 'testContainer1' }],
         },
@@ -137,18 +168,26 @@ describe('shouldNotUsePullPolicyAlways', function() {
   test('fails when imagePullPolicy is set to `Always`', function() {
     expect(
       pod.shouldNotUsePullPolicyAlways({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [{ name: 'testContainer1', imagePullPolicy: 'Always' }],
         },
       })
     ).toEqual({
       valid: false,
-      errors: ['Container testContainer1 uses imagePullPolicy `Always`'],
+      errors: [
+        'Container testContainer1 in pod geralt uses imagePullPolicy `Always`',
+      ],
     });
   });
   test('checks all containers', function() {
     expect(
       pod.shouldNotUsePullPolicyAlways({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           containers: [
             { name: 'testContainer1', imagePullPolicy: 'Always' },
@@ -159,8 +198,8 @@ describe('shouldNotUsePullPolicyAlways', function() {
     ).toEqual({
       valid: false,
       errors: [
-        'Container testContainer1 uses imagePullPolicy `Always`',
-        'Container testContainer2 uses imagePullPolicy `Always`',
+        'Container testContainer1 in pod geralt uses imagePullPolicy `Always`',
+        'Container testContainer2 in pod geralt uses imagePullPolicy `Always`',
       ],
     });
   });

@@ -4,6 +4,9 @@ describe('shouldNotUseExternalIPs', function() {
   test('passes when externalIPs is not used', function() {
     var specs = [
       {
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           type: 'ClusterIP',
           clusterIP: 'None',
@@ -11,6 +14,9 @@ describe('shouldNotUseExternalIPs', function() {
         },
       },
       {
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           type: 'ExternalName',
           externalName: 'example.com.',
@@ -18,6 +24,9 @@ describe('shouldNotUseExternalIPs', function() {
         },
       },
       {
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           type: 'ClusterIP',
           ports: [{ name: 'http', port: 8080, targetPort: 'http' }],
@@ -35,13 +44,16 @@ describe('shouldNotUseExternalIPs', function() {
   test('fails if externalIPs is used', function() {
     expect(
       service.shouldNotUseExternalIPs({
+        metadata: {
+          name: 'geralt',
+        },
         spec: {
           externalIPs: ['192.168.1.1'],
         },
       })
     ).toEqual({
       valid: false,
-      errors: ['Service uses `externalIPs`'],
+      errors: ['Service geralt uses `externalIPs`'],
     });
   });
 });

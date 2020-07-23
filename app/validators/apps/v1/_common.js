@@ -6,12 +6,20 @@ function shouldSetImageTag(object) {
     errors: [],
   };
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var imageAndTag = container.image.split(':');
     if (imageAndTag.length === 1) {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' does not have image tag set'
+        'Container ' +
+          container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
+          ' does not have image tag set'
       );
     }
   });
@@ -24,12 +32,20 @@ function shouldNotUseTagLatest(object) {
     errors: [],
   };
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var imageAndTag = container.image.split(':');
     if (imageAndTag.length === 2 && imageAndTag[1] === 'latest') {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' uses image with `latest` tag'
+        'Container ' +
+          container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
+          ' uses image with `latest` tag'
       );
     }
   });
@@ -42,12 +58,20 @@ function shouldNotUsePullPolicyAlways(object) {
     errors: [],
   };
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var imagePullPolicy = container.imagePullPolicy;
     if (imagePullPolicy === 'Always') {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' uses imagePullPolicy `Always`'
+        'Container ' +
+          container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
+          ' uses imagePullPolicy `Always`'
       );
     }
   });
@@ -60,6 +84,8 @@ function shouldSetRequestsLimits(object) {
     errors: [],
   };
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var resources = container.resources;
     if (resources === undefined) {
@@ -67,6 +93,10 @@ function shouldSetRequestsLimits(object) {
       result.errors.push(
         'Container ' +
           container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
           ' does not have resources requirements set'
       );
       return;
@@ -75,19 +105,37 @@ function shouldSetRequestsLimits(object) {
     if (resources.limits === undefined) {
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' does not have resources limits set'
+        'Container ' +
+          container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
+          ' does not have resources limits set'
       );
     } else {
       if (resources.limits.cpu === undefined) {
         result.valid = false;
         result.errors.push(
-          'Container ' + container.name + ' does not have CPU limits set'
+          'Container ' +
+            container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
+            ' does not have CPU limits set'
         );
       }
       if (resources.limits.memory === undefined) {
         result.valid = false;
         result.errors.push(
-          'Container ' + container.name + ' does not have memory limits set'
+          'Container ' +
+            container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
+            ' does not have memory limits set'
         );
       }
     }
@@ -102,19 +150,37 @@ function shouldSetRequestsLimits(object) {
       // resources limits are missing as well
       result.valid = false;
       result.errors.push(
-        'Container ' + container.name + ' does not have resources requests set'
+        'Container ' +
+          container.name +
+          ' in ' +
+          kind +
+          ' ' +
+          name +
+          ' does not have resources requests set'
       );
     } else if (resources.requests !== undefined) {
       if (resources.requests.cpu === undefined) {
         result.valid = false;
         result.errors.push(
-          'Container ' + container.name + ' does not have CPU requests set'
+          'Container ' +
+            container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
+            ' does not have CPU requests set'
         );
       }
       if (resources.requests.memory === undefined) {
         result.valid = false;
         result.errors.push(
-          'Container ' + container.name + ' does not have memory requests set'
+          'Container ' +
+            container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
+            ' does not have memory requests set'
         );
       }
     }
@@ -129,6 +195,8 @@ function shouldNotUseMegasharesForCPU(object) {
   };
 
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var resources = container.resources;
     if (resources === undefined) return;
@@ -142,6 +210,10 @@ function shouldNotUseMegasharesForCPU(object) {
         result.errors.push(
           'Container ' +
             container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
             ' uses invalid measurement unit for CPU request'
         );
       }
@@ -153,6 +225,10 @@ function shouldNotUseMegasharesForCPU(object) {
         result.errors.push(
           'Container ' +
             container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
             ' uses invalid measurement unit for CPU limit'
         );
       }
@@ -169,6 +245,8 @@ function shouldNotUseMillisharesForMemory(object) {
   };
 
   var containers = object.spec.template.spec.containers;
+  var kind = object.kind;
+  var name = object.metadata.name;
   containers.forEach(function(container) {
     var resources = container.resources;
     if (resources === undefined) return;
@@ -182,6 +260,10 @@ function shouldNotUseMillisharesForMemory(object) {
         result.errors.push(
           'Container ' +
             container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
             ' uses invalid measurement unit for memory request'
         );
       }
@@ -196,6 +278,10 @@ function shouldNotUseMillisharesForMemory(object) {
         result.errors.push(
           'Container ' +
             container.name +
+            ' in ' +
+            kind +
+            ' ' +
+            name +
             ' uses invalid measurement unit for memory limit'
         );
       }

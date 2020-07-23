@@ -10,7 +10,9 @@ function shouldNotUseExternalIPs(serviceObject) {
     serviceObject.spec.externalIPs !== null
   ) {
     result.valid = false;
-    result.errors.push('Service uses `externalIPs`');
+    result.errors.push(
+      'Service ' + serviceObject.metadata.name + ' uses `externalIPs`'
+    );
   }
   return result;
 }
