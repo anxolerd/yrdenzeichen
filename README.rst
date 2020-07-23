@@ -64,7 +64,7 @@ Kubernetes
           spec:
             containers:
             - name: yrdenzeichen
-              image: anxolerd/yrden:20200103.1657
+              image: anxolerd/yrden:20200723.1219
               imagePullPolicy: IfNotPresent
               ports:
               - containerPort: 3000
