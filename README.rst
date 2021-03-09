@@ -15,6 +15,8 @@ Deployment
 Kubernetes
 ~~~~~~~~~~
 
+TODO: describe deployment without embedding certificates into the pod
+
 1. Create namespace for yrdenzeichen
 
    .. code:: console
