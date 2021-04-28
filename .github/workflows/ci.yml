@@ -47,14 +47,15 @@ jobs:
       - run: npm test
         working-directory: ./app
 
+
   package:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     needs: [lint, test]
     steps:
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M')"
+      - name: Get image tag
+        id: getTag
+        run: echo "::set-output name=tag::$(date +'%Y%m%d.%H%M')"
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -67,4 +68,4 @@ jobs:
         with:
           push: true
           context: .
-          tags: anxolerd/yrden:${{ steps.date.output.date }}
+          tags: anxolerd/yrden:${{ steps.getTag.outputs.tag }}
