@@ -68,4 +68,4 @@ jobs:
         with:
           push: true
           context: .
-          tags: anxolerd/yrden:${{ steps.getTag.outputs.tag }}
+          tags: anxolerd/yrden:${{ steps.getTag.outputs.tag }}, anxolerd/yrden:latest
