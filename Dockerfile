@@ -9,7 +9,7 @@ COPY ./app/*.js .
 COPY ./app/validators ./validators
 
 
-FROM gcr.io/distroless/nodejs
+FROM gcr.io/distroless/nodejs:10
 COPY --from=build-env /app /app
 COPY LICENSE LICENSE
 WORKDIR /app
