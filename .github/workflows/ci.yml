@@ -1,0 +1,70 @@
+name: Run linters and tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version:
+          - 8.x
+          - 14.x
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+        working-directory: ./app
+      - run: npm run lint --if-present
+        working-directory: ./app
+
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version:
+          - 8.x
+          - 10.x
+          - 12.x
+          - 14.x
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-$node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+        working-directory: ./app
+      - run: npm test
+        working-directory: ./app
+
+  package:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: [lint, test]
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M')"
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          tags: anxolerd/yrden:${{ steps.date.output.date }}
