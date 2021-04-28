@@ -6,7 +6,7 @@ ENV NODE_ENV=production
 COPY ./app/package*.json .
 RUN npm ci
 COPY ./app/*.js .
-COPY ./app/validators .
+COPY ./app/validators ./validators
 
 
 FROM gcr.io/distroless/nodejs
