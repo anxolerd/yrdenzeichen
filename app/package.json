@@ -22,7 +22,7 @@
   "dependencies": {
     "@opentelemetry/exporter-prometheus": "0.3.2",
     "@opentelemetry/metrics": "0.3.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "winston": "^3.2.1"
   },
   "devDependencies": {
